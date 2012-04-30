@@ -23,7 +23,7 @@ public class BarChart extends JavaScriptObject {
 			top : 10,
 			right : 10,
 			bottom : 20,
-			left : 10
+			left : 20
 		}, x, y = d3.scale.linear().range([ 60, 0 ]), id = $wnd.barChart_id++, axis = d3.svg
 				.axis().orient("bottom"), brush = d3.svg.brush(), brushDirty, dimension, group, round, title;
 		var axisy = d3.svg.axis().orient("left");
@@ -68,7 +68,7 @@ public class BarChart extends JavaScriptObject {
 							"translate(0," + height + ")").call(axis);
 
 					g.append("g").attr("class", "axis").attr("transform",
-							"translate(20,0)").call(axisy);
+							"translate(30,0)").call(axisy);
 
 					// Initialize the brush component with pretty resize handles.
 					var gBrush = g.append("g").attr("class", "brush").call(
@@ -271,7 +271,7 @@ public class BarChart extends JavaScriptObject {
 		var d3 = $wnd.d3;
 		this.dimension(dim).group(group).x(
 				d3.scale.linear().domain([ from, to ])
-						.rangeRound([ 25, width ]));
+						.rangeRound([ 35, width ]));
 		return this;
     }-*/;
 
@@ -279,7 +279,7 @@ public class BarChart extends JavaScriptObject {
         JavaScriptObject from, JavaScriptObject to, int width) /*-{
 		var d3 = $wnd.d3;
 		this.dimension(dim).group(group).round(d3.time.day.round).x(
-				d3.time.scale().domain([ from, to ]).rangeRound([ 25, width ]));
+				d3.time.scale().domain([ from, to ]).rangeRound([ 35, width ]));
 
 		return this;
     }-*/;

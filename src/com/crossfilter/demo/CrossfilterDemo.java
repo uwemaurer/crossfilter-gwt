@@ -1,6 +1,5 @@
 package com.crossfilter.demo;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -156,6 +155,8 @@ public class CrossfilterDemo implements EntryPoint {
                 return object.getValue5();
             }
         });
+       
+        
         List<Data> top = d2.top(5);
         for (Data da : top) {
             GWT.log("" + da);
@@ -168,34 +169,36 @@ public class CrossfilterDemo implements EntryPoint {
                 return object;
             }
         });
+        
         final SingleGroup<Data, Integer> all = crossfilter.groupAll();
         Group<Data, Integer> g2 = d2.group();
         Group<Data, Double> g3 = d3.group(new DoubleGrouping() {
-
             @Override
             public double getGroup(double object) {
                 return Math.floor(object * 10) / 10;
             }
-
         });
         Group<Data, String> g4 = d4.group();
-        Group<Data, Date> g5 = d5.group(new DateGrouping() {
-
-            @Override
-            public Date getGroup(Date value) {
-                return Util.day(value);
-            }
-            
-        });
+        Group<Data, Date> g5 = d5.group(Util.createDayGrouping());
 
         JsArray<KeyValue> top2 = g3.top(5);
         for (int i = 0; i < top2.length(); i++) {
             GWT.log("" + top2.get(i).getValue());
         }
+        
+        Group<Data, Date> g6 = d5.group(Util.createDayGrouping()).reduceSum(new IntDimensionType<CrossfilterDemo.Data>() {
+
+            @Override
+            public int getValue(Data object) {
+                return object.getValue1();
+            }
+        });
+        
         BarChart chart = BarChart.create(d1, g, 1000).title("value1");
         BarChart chart2 = BarChart.create(d2, g2, 1000).title("value2");
         BarChart chart3 = BarChart.create(d3, g3, 1000).title("value3");
         BarChart chart5 = BarChart.createDate(d5, g5, 1000).title("value5");
+        BarChart chart6 = BarChart.createDate(d5, g6, 1000).title("value5");
 
         CellTable<Data> table = new CellTable<Data>();
         TextColumn<Data> nameColumn = new TextColumn<Data>() {
@@ -217,17 +220,18 @@ public class CrossfilterDemo implements EntryPoint {
         dataProvider.addDataDisplay(table);
 
         final Label allLabel = new Label();
-        
-        BarChart.render(RootPanel.getBodyElement(), Arrays.asList(chart, chart2, chart3, chart5), new RenderCallback() {
 
-            @Override
-            public void renderAll() {
-                dataProvider.getList().clear();
-                dataProvider.getList().addAll(d5.top(10));
-                dataProvider.refresh();
-                allLabel.setText("" + all.getValue() + " of " + crossfilter.size());
-            }
-        });
+        BarChart.render(RootPanel.getBodyElement(), Arrays.asList(chart, chart2, chart3, chart5, chart6),
+            new RenderCallback() {
+
+                @Override
+                public void renderAll() {
+                    dataProvider.getList().clear();
+                    dataProvider.getList().addAll(d5.top(10));
+                    dataProvider.refresh();
+                    allLabel.setText("" + all.getValue() + " of " + crossfilter.size());
+                }
+            });
         RootPanel.get().add(allLabel);
         RootPanel.get().add(table);
     }

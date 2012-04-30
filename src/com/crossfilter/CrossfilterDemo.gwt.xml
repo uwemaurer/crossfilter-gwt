@@ -6,5 +6,5 @@
 	
 	<source path='demo' />
 
-	<entry-point class='com.crossfilter.client.demo.CrossfilterDemo' />
+	<entry-point class='com.crossfilter.demo.CrossfilterDemo' />
 </module>

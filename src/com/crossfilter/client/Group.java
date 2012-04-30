@@ -1,5 +1,6 @@
 package com.crossfilter.client;
 
+import com.crossfilter.client.Dimension.DimensionType;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
@@ -26,9 +27,9 @@ public class Group<T, K> extends JavaScriptObject {
 		return this.reduceCount();
     }-*/;
 
-    // public final native Group<T, K> reduceSum() /*-{
-    // return this.reduceSum();
-    // }-*/;
+     public final native <V> Group<T, K> reduceSum(final DimensionType<T, V> type) /*-{
+         return this.reduceSum(type.@com.crossfilter.client.Dimension.DimensionType::getFunction()());
+     }-*/;
 
     // public final native Group<T, K> order() /*-{
     // return this.order();
