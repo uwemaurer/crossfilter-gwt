@@ -3,10 +3,9 @@
   padding: 10px 0;
 }
 
-.chart {
+.crossfilter-chart {
   display: inline-block;
-  height: 151px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 .reset {

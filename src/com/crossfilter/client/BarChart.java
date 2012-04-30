@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.crossfilter.client.Group.KeyValue;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Element;
 
 public class BarChart extends JavaScriptObject {
 
@@ -220,20 +221,20 @@ public class BarChart extends JavaScriptObject {
         void renderAll();
     }
     
-    public static final void render(Collection<BarChart> charts, RenderCallback callback) {
+    public static final void render(Element parent, Collection<BarChart> charts, RenderCallback callback) {
         @SuppressWarnings("unchecked")
         JsArray<JavaScriptObject> array = (JsArray<JavaScriptObject>) JavaScriptObject.createArray();
         for (BarChart chart : charts) {
             array.push(chart);
         }
-        render(array, callback);
+        render(parent, array, callback);
     }
 
-    private static final native void render(JsArray<JavaScriptObject> charts, RenderCallback callback) /*-{
+    private static final native void render(Element parent, JsArray<JavaScriptObject> charts, RenderCallback callback) /*-{
 		$wnd.charts = charts;
 		var d3 = $wnd.d3;
-		var chart = d3.select("body").selectAll(".chart").data(charts);
-		chart.enter().append("div").html(function(d) {
+		var chart = d3.select(parent).selectAll(".crossfilter-chart").data(charts);
+		chart.enter().append("div").attr("class","crossfilter-chart").html(function(d) {
 			return "<div class='title'>" + d.title() + "</div>";
 		});
 		chart.exit().remove();
@@ -294,7 +295,7 @@ public class BarChart extends JavaScriptObject {
     public static <T, K> BarChart create(Dimension<T, K> dim, Group<T, K> group, int width) {
         JsArray<KeyValue> all = group.all();
         double min = all.get(0).getKey();
-        double max = all.get(all.length() - 1).getKey();
+        double max = all.get(all.length() - 1).getKey() + 0.1;
         return create(dim, group, min, max, width);
     }
 
@@ -303,7 +304,6 @@ public class BarChart extends JavaScriptObject {
         BarChart barChart = create();
         barChart.setDate(dim, group, all.get(0).getKeyAsJSO(),
             all.get(all.length() - 1).getKeyAsJSO(), width);
-
         return barChart;
     }
 

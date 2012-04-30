@@ -1,4 +1,4 @@
-package com.crossfilter.client.demo;
+package com.crossfilter.demo;
 
 
 import java.util.ArrayList;
@@ -218,7 +218,7 @@ public class CrossfilterDemo implements EntryPoint {
 
         final Label allLabel = new Label();
         
-        BarChart.render(Arrays.asList(chart, chart2, chart3, chart5), new RenderCallback() {
+        BarChart.render(RootPanel.getBodyElement(), Arrays.asList(chart, chart2, chart3, chart5), new RenderCallback() {
 
             @Override
             public void renderAll() {
