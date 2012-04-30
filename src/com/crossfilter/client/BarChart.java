@@ -23,14 +23,14 @@ public class BarChart extends JavaScriptObject {
 			right : 10,
 			bottom : 20,
 			left : 10
-		}, x, y = d3.scale.linear().range([ 150, 0 ]), id = $wnd.barChart_id++, axis = d3.svg
+		}, x, y = d3.scale.linear().range([ 60, 0 ]), id = $wnd.barChart_id++, axis = d3.svg
 				.axis().orient("bottom"), brush = d3.svg.brush(), brushDirty, dimension, group, round, title;
 		var axisy = d3.svg.axis().orient("left");
 
 		function chart(div) {
 
 			y.domain([ 0, group.top(1)[0].value ]);
-			axisy.scale(y);
+			axisy.scale(y).ticks(5);
 			var width = x.range()[1], height = y.range()[0];
 
 			div.each(function() {

@@ -11,6 +11,7 @@ import com.crossfilter.client.BarChart.RenderCallback;
 import com.crossfilter.client.Crossfilter;
 import com.crossfilter.client.Dimension;
 import com.crossfilter.client.Dimension.DateDimensionType;
+import com.crossfilter.client.Dimension.DateGrouping;
 import com.crossfilter.client.Dimension.DoubleDimensionType;
 import com.crossfilter.client.Dimension.DoubleGrouping;
 import com.crossfilter.client.Dimension.IntDimensionType;
@@ -19,6 +20,7 @@ import com.crossfilter.client.Dimension.StringDimensionType;
 import com.crossfilter.client.Group;
 import com.crossfilter.client.Group.KeyValue;
 import com.crossfilter.client.SingleGroup;
+import com.crossfilter.client.Util;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -114,7 +116,7 @@ public class CrossfilterDemo implements EntryPoint {
                 + (int) (Math.random() * 6), new Date(System.currentTimeMillis() + i * 1000000)));
         }
 
-        Crossfilter<Data> crossfilter = Crossfilter.create(data);
+        final Crossfilter<Data> crossfilter = Crossfilter.create(data);
 
         GWT.log("" + crossfilter.size());
 
@@ -177,7 +179,14 @@ public class CrossfilterDemo implements EntryPoint {
 
         });
         Group<Data, String> g4 = d4.group();
-        Group<Data, Date> g5 = d5.group();
+        Group<Data, Date> g5 = d5.group(new DateGrouping() {
+
+            @Override
+            public Date getGroup(Date value) {
+                return Util.day(value);
+            }
+            
+        });
 
         JsArray<KeyValue> top2 = g3.top(5);
         for (int i = 0; i < top2.length(); i++) {
@@ -216,7 +225,7 @@ public class CrossfilterDemo implements EntryPoint {
                 dataProvider.getList().clear();
                 dataProvider.getList().addAll(d5.top(10));
                 dataProvider.refresh();
-                allLabel.setText("" + all.getValue());
+                allLabel.setText("" + all.getValue() + " of " + crossfilter.size());
             }
         });
         RootPanel.get().add(allLabel);

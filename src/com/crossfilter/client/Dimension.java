@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsDate;
 
 public class Dimension<T, K> extends JavaScriptObject {
 
@@ -72,14 +73,14 @@ public class Dimension<T, K> extends JavaScriptObject {
             return f();
         }
 
-        private double getTime(T object) {
-            return (double)getValue(object).getTime();
+        private JsDate getTime(T object) {
+            return Util.toJs(getValue(object));
         }
         
         private final native JavaScriptObject f() /*-{
 			var self = this;
 			return function(v) {
-				return new Date(self.@com.crossfilter.client.Dimension.DateDimensionType::getTime(Ljava/lang/Object;)(v));
+				return self.@com.crossfilter.client.Dimension.DateDimensionType::getTime(Ljava/lang/Object;)(v);
 			};
         }-*/;
     }
@@ -136,6 +137,26 @@ public class Dimension<T, K> extends JavaScriptObject {
         }-*/;
     }
 
+    public static abstract class DateGrouping extends Grouping<Date> {
+        public abstract Date getGroup(Date value);
+        
+        private JsDate getGroup(JsDate value) {
+            return Util.toJs(getGroup(Util.toGWT(value)));
+        }
+        
+        @Override
+        protected JavaScriptObject getGroupFunction() {
+            return f();
+        }
+
+        private final native JavaScriptObject f() /*-{
+            var self = this;
+            return function(v) {
+                return self.@com.crossfilter.client.Dimension.DateGrouping::getGroup(Lcom/google/gwt/core/client/JsDate;)(v);
+            };
+        }-*/;
+    }
+    
     public final native Group<T, K> group() /*-{
 		return this.group();
     }-*/;
