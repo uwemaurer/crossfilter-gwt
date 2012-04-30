@@ -53,7 +53,7 @@ public class Crossfilter<T> extends JavaScriptObject {
 		return this.dimension(func);
     }-*/;
 
-    
-    // todo: groupAll
-
+    public final native <K> SingleGroup<T, K> groupAll() /*-{
+        return this.groupAll();
+    }-*/;
 }

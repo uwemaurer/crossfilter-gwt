@@ -216,16 +216,20 @@ public class BarChart extends JavaScriptObject {
 		return resultChart;
     }-*/;
 
-    public static final void render(Collection<BarChart> charts) {
+    public interface RenderCallback {
+        void renderAll();
+    }
+    
+    public static final void render(Collection<BarChart> charts, RenderCallback callback) {
         @SuppressWarnings("unchecked")
         JsArray<JavaScriptObject> array = (JsArray<JavaScriptObject>) JavaScriptObject.createArray();
         for (BarChart chart : charts) {
             array.push(chart);
         }
-        render(array);
+        render(array, callback);
     }
 
-    private static final native void render(JsArray<JavaScriptObject> charts) /*-{
+    private static final native void render(JsArray<JavaScriptObject> charts, RenderCallback callback) /*-{
 		$wnd.charts = charts;
 		var d3 = $wnd.d3;
 		var chart = d3.select("body").selectAll(".chart").data(charts);
@@ -256,6 +260,7 @@ public class BarChart extends JavaScriptObject {
 			chart.each(render);
 			//list.each(render);
 			//d3.select("#active").text(formatNumber(all.value()));
+			callback.@com.crossfilter.client.BarChart.RenderCallback::renderAll()();
 		}
 		$wnd.renderAll = renderAll;
     }-*/;

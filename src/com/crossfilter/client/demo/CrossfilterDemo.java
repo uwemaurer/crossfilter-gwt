@@ -1,11 +1,13 @@
 package com.crossfilter.client.demo;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import com.crossfilter.client.BarChart;
+import com.crossfilter.client.BarChart.RenderCallback;
 import com.crossfilter.client.Crossfilter;
 import com.crossfilter.client.Dimension;
 import com.crossfilter.client.Dimension.DateDimensionType;
@@ -16,11 +18,15 @@ import com.crossfilter.client.Dimension.IntGrouping;
 import com.crossfilter.client.Dimension.StringDimensionType;
 import com.crossfilter.client.Group;
 import com.crossfilter.client.Group.KeyValue;
+import com.crossfilter.client.SingleGroup;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.view.client.ListDataProvider;
 
 /**
  * demo / test application
@@ -34,8 +40,6 @@ public class CrossfilterDemo implements EntryPoint {
      * This is the entry point method.
      */
     public void onModuleLoad() {
-        final Button sendButton = new Button("Send");
-        RootPanel.get().add(sendButton);
 
         demo();
     }
@@ -104,7 +108,7 @@ public class CrossfilterDemo implements EntryPoint {
     }
 
     private void demo() {
-        List<Data> data = new ArrayList<Data>();
+        final List<Data> data = new ArrayList<Data>();
         for (int i = 0; i < 2000; i++) {
             data.add(new Data(i, (int) (Math.random() * Math.random() * i), Math.random(), "abc"
                 + (int) (Math.random() * 6), new Date(System.currentTimeMillis() + i * 1000000)));
@@ -143,7 +147,7 @@ public class CrossfilterDemo implements EntryPoint {
                 return object.getValue4();
             }
         });
-        Dimension<Data, Date> d5 = crossfilter.dimension(new DateDimensionType<CrossfilterDemo.Data>() {
+        final Dimension<Data, Date> d5 = crossfilter.dimension(new DateDimensionType<CrossfilterDemo.Data>() {
 
             @Override
             public Date getValue(Data object) {
@@ -162,7 +166,7 @@ public class CrossfilterDemo implements EntryPoint {
                 return object;
             }
         });
-
+        final SingleGroup<Data, Integer> all = crossfilter.groupAll();
         Group<Data, Integer> g2 = d2.group();
         Group<Data, Double> g3 = d3.group(new DoubleGrouping() {
 
@@ -184,7 +188,39 @@ public class CrossfilterDemo implements EntryPoint {
         BarChart chart3 = BarChart.create(d3, g3, 1000).title("value3");
         BarChart chart5 = BarChart.createDate(d5, g5, 1000).title("value5");
 
-        BarChart.render(Arrays.asList(chart, chart2, chart3, chart5));
+        CellTable<Data> table = new CellTable<Data>();
+        TextColumn<Data> nameColumn = new TextColumn<Data>() {
+            @Override
+            public String getValue(Data object) {
+                return object.toString();
+            }
+        };
+        table.addColumn(nameColumn);
+        TextColumn<Data> nameColumn2 = new TextColumn<Data>() {
+            @Override
+            public String getValue(Data object) {
+                return object.getValue5().toString();
+            }
+        };
+        table.addColumn(nameColumn2);
+
+        final ListDataProvider<Data> dataProvider = new ListDataProvider<Data>();
+        dataProvider.addDataDisplay(table);
+
+        final Label allLabel = new Label();
+        
+        BarChart.render(Arrays.asList(chart, chart2, chart3, chart5), new RenderCallback() {
+
+            @Override
+            public void renderAll() {
+                dataProvider.getList().clear();
+                dataProvider.getList().addAll(d5.top(10));
+                dataProvider.refresh();
+                allLabel.setText("" + all.getValue());
+            }
+        });
+        RootPanel.get().add(allLabel);
+        RootPanel.get().add(table);
     }
 
 }

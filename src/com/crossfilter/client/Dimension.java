@@ -229,4 +229,8 @@ public class Dimension<T, K> extends JavaScriptObject {
         }
         return list;
     }
+    
+    public final native SingleGroup<T, K> groupAll() /*-{
+        return this.groupAll();
+    }-*/;
 }
