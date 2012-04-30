@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='crossfilter_gwt'>
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name='com.google.gwt.user.theme.clean.Clean' />
+	<entry-point class='com.crossfilter.client.demo.CrossfilterDemo' />
+
+	<stylesheet src="crossfilter.css" />
+	<script src="d3.v2.min.js" />
+	<script src="crossfilter.min.js" />
+	<source path='client' />
+
+</module>

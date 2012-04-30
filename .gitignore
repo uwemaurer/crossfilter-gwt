@@ -1,0 +1,6 @@
+war/WEB-INF/lib/gwt-servlet.jar
+gwt-unitCache/
+war/WEB-INF/classes
+war/WEB-INF/deploy
+war/crossfilter_gwt
+.settings
