@@ -20,8 +20,12 @@ public class Util {
         return new GroupingFunction<Double>(roundToMultiple(m));
     }
 
-    public static Grouping<Date> createDayGrouping() {
+    public static Grouping<Date> createGroupingDays() {
         return new GroupingFunction<Date>(roundToDays());
+    }
+
+    public static Grouping<Date> createGroupingWeeks() {
+        return new GroupingFunction<Date>(roundToWeeks());
     }
 
     private static final native JavaScriptObject roundToMultiple(double m) /*-{
@@ -33,6 +37,12 @@ public class Util {
     private static final native JavaScriptObject roundToDays() /*-{
 		return function(v) {
 			return $wnd.d3.time.day(v);
+		};
+    }-*/;
+
+    private static final native JavaScriptObject roundToWeeks() /*-{
+		return function(v) {
+			return $wnd.d3.time.week(v);
 		};
     }-*/;
 
