@@ -2,7 +2,7 @@ package com.crossfilter.client;
 
 import java.util.Collection;
 
-import com.crossfilter.client.Dimension.DimensionType;
+import com.crossfilter.client.Dimension.Reducer;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
@@ -29,8 +29,7 @@ public class Crossfilter<T> extends JavaScriptObject {
     }-*/;
 
     public final Crossfilter<T> add(Collection<T> data) {
-        @SuppressWarnings("unchecked")
-        JsArray<JavaScriptObject> array = (JsArray<JavaScriptObject>) JavaScriptObject.createArray();
+        JsArray<JavaScriptObject> array = JsArray.createArray().cast();
         for (T element : data) {
             push(array, element);
         }
@@ -45,7 +44,7 @@ public class Crossfilter<T> extends JavaScriptObject {
 		array[array.length] = value;
     }-*/;
 
-    public final <K> Dimension<T, K> dimension(final DimensionType<T, K> type) {
+    public final <K> Dimension<T, K> dimension(final Reducer<T, K> type) {
         return dimension(type.getFunction());
     }
 
@@ -54,6 +53,6 @@ public class Crossfilter<T> extends JavaScriptObject {
     }-*/;
 
     public final native <K> SingleGroup<T, K> groupAll() /*-{
-        return this.groupAll();
+		return this.groupAll();
     }-*/;
 }

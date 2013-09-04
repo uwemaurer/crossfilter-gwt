@@ -7,6 +7,10 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 
+@Deprecated
+/**
+ * @deprecated use the DC charts instead
+ */
 public class BarChart extends JavaScriptObject {
 
     protected BarChart() {

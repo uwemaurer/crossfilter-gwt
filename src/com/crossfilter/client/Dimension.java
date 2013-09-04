@@ -13,11 +13,11 @@ public class Dimension<T, K> extends JavaScriptObject {
     protected Dimension() {
     }
 
-    public static abstract class DimensionType<T, K> {
+    public static abstract class Reducer<T, K> {
         protected abstract JavaScriptObject getFunction();
     }
 
-    public static abstract class IntDimensionType<T> extends DimensionType<T, Integer> {
+    public static abstract class IntReducer<T> extends Reducer<T, Integer> {
         public abstract int getValue(T object);
 
         @Override
@@ -28,12 +28,12 @@ public class Dimension<T, K> extends JavaScriptObject {
         private final native JavaScriptObject f() /*-{
 			var self = this;
 			return function(v) {
-				return self.@com.crossfilter.client.Dimension.IntDimensionType::getValue(Ljava/lang/Object;)(v);
+				return self.@com.crossfilter.client.Dimension.IntReducer::getValue(Ljava/lang/Object;)(v);
 			};
         }-*/;
     }
 
-    public static abstract class DoubleDimensionType<T> extends DimensionType<T, Double> {
+    public static abstract class DoubleReducer<T> extends Reducer<T, Double> {
         public abstract double getValue(T object);
 
         @Override
@@ -44,12 +44,12 @@ public class Dimension<T, K> extends JavaScriptObject {
         private final native JavaScriptObject f() /*-{
 			var self = this;
 			return function(v) {
-				return self.@com.crossfilter.client.Dimension.DoubleDimensionType::getValue(Ljava/lang/Object;)(v);
+				return self.@com.crossfilter.client.Dimension.DoubleReducer::getValue(Ljava/lang/Object;)(v);
 			};
         }-*/;
     }
 
-    public static abstract class StringDimensionType<T> extends DimensionType<T, String> {
+    public static abstract class StringReducer<T> extends Reducer<T, String> {
         public abstract String getValue(T object);
 
         @Override
@@ -60,14 +60,14 @@ public class Dimension<T, K> extends JavaScriptObject {
         private final native JavaScriptObject f() /*-{
 			var self = this;
 			return function(v) {
-				return self.@com.crossfilter.client.Dimension.StringDimensionType::getValue(Ljava/lang/Object;)(v);
+				return self.@com.crossfilter.client.Dimension.StringReducer::getValue(Ljava/lang/Object;)(v);
 			};
         }-*/;
     }
 
-    public static abstract class DateDimensionType<T> extends DimensionType<T, Date> {
+    public static abstract class DateReducer<T> extends Reducer<T, Date> {
         public abstract Date getValue(T object);
-        
+
         @Override
         protected JavaScriptObject getFunction() {
             return f();
@@ -76,11 +76,40 @@ public class Dimension<T, K> extends JavaScriptObject {
         private JsDate getTime(T object) {
             return Util.toJs(getValue(object));
         }
-        
+
         private final native JavaScriptObject f() /*-{
 			var self = this;
 			return function(v) {
-				return self.@com.crossfilter.client.Dimension.DateDimensionType::getTime(Ljava/lang/Object;)(v);
+				return self.@com.crossfilter.client.Dimension.DateReducer::getTime(Ljava/lang/Object;)(v);
+			};
+        }-*/;
+    }
+
+    public static abstract class ObjectReducer<T, V> {
+        public abstract V reduceAdd(V result, T object);
+
+        public abstract V reduceRemove(V result, T object);
+
+        public abstract V reduceInitial();
+
+        protected final native JavaScriptObject reduceAdd() /*-{
+			var self = this;
+			return function(a, b) {
+				return self.@com.crossfilter.client.Dimension.ObjectReducer::reduceAdd(Ljava/lang/Object;Ljava/lang/Object;)(a,b);
+			};
+        }-*/;
+
+        protected final native JavaScriptObject reduceRemove() /*-{
+			var self = this;
+			return function(a, b) {
+				return self.@com.crossfilter.client.Dimension.ObjectReducer::reduceRemove(Ljava/lang/Object;Ljava/lang/Object;)(a,b);
+			};
+        }-*/;
+
+        protected final native JavaScriptObject reduceInitialJs() /*-{
+			var self = this;
+			return function() {
+				return self.@com.crossfilter.client.Dimension.ObjectReducer::reduceInitial()();
 			};
         }-*/;
     }
@@ -139,24 +168,24 @@ public class Dimension<T, K> extends JavaScriptObject {
 
     public static abstract class DateGrouping extends Grouping<Date> {
         public abstract Date getGroup(Date value);
-        
+
         private JsDate getGroup(JsDate value) {
             return Util.toJs(getGroup(Util.toGWT(value)));
         }
-        
+
         @Override
         protected JavaScriptObject getGroupFunction() {
             return f();
         }
 
         private final native JavaScriptObject f() /*-{
-            var self = this;
-            return function(v) {
-                return self.@com.crossfilter.client.Dimension.DateGrouping::getGroup(Lcom/google/gwt/core/client/JsDate;)(v);
-            };
+			var self = this;
+			return function(v) {
+				return self.@com.crossfilter.client.Dimension.DateGrouping::getGroup(Lcom/google/gwt/core/client/JsDate;)(v);
+			};
         }-*/;
     }
-    
+
     public final native Group<T, K> group() /*-{
 		return this.group();
     }-*/;
@@ -238,20 +267,37 @@ public class Dimension<T, K> extends JavaScriptObject {
 		return this.top(n);
     }-*/;
 
+    private final native JsArray<JavaScriptObject> bottomJs(int n) /*-{
+		return this.bottom(n);
+    }-*/;
+
     private final native T get(JsArray<JavaScriptObject> obj, int index) /*-{
 		return obj[index];
     }-*/;
 
     public final List<T> top(int n) {
-        List<T> list = new ArrayList<T>();
         JsArray<JavaScriptObject> topList = topJs(n);
+        return toList(topList);
+    }
+
+    public final List<T> bottom(int n) {
+        JsArray<JavaScriptObject> topList = bottomJs(n);
+        return toList(topList);
+    }
+
+    private List<T> toList(JsArray<JavaScriptObject> topList) {
+        List<T> list = new ArrayList<T>();
         for (int i = 0; i < topList.length(); i++) {
             list.add(get(topList, i));
         }
         return list;
     }
-    
+
     public final native SingleGroup<T, K> groupAll() /*-{
-        return this.groupAll();
+		return this.groupAll();
     }-*/;
+
+    public static JavaScriptObject _getFunction(Reducer<?, ?> func) {
+        return func.getFunction();
+    }
 }

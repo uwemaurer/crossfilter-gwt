@@ -9,13 +9,12 @@ import com.crossfilter.client.BarChart;
 import com.crossfilter.client.BarChart.RenderCallback;
 import com.crossfilter.client.Crossfilter;
 import com.crossfilter.client.Dimension;
-import com.crossfilter.client.Dimension.DateDimensionType;
-import com.crossfilter.client.Dimension.DateGrouping;
-import com.crossfilter.client.Dimension.DoubleDimensionType;
+import com.crossfilter.client.Dimension.DateReducer;
+import com.crossfilter.client.Dimension.DoubleReducer;
 import com.crossfilter.client.Dimension.DoubleGrouping;
-import com.crossfilter.client.Dimension.IntDimensionType;
+import com.crossfilter.client.Dimension.IntReducer;
 import com.crossfilter.client.Dimension.IntGrouping;
-import com.crossfilter.client.Dimension.StringDimensionType;
+import com.crossfilter.client.Dimension.StringReducer;
 import com.crossfilter.client.Group;
 import com.crossfilter.client.Group.KeyValue;
 import com.crossfilter.client.SingleGroup;
@@ -119,7 +118,7 @@ public class CrossfilterDemo implements EntryPoint {
 
         GWT.log("" + crossfilter.size());
 
-        Dimension<Data, Integer> d1 = crossfilter.dimension(new IntDimensionType<CrossfilterDemo.Data>() {
+        Dimension<Data, Integer> d1 = crossfilter.dimension(new IntReducer<CrossfilterDemo.Data>() {
 
             @Override
             public int getValue(Data object) {
@@ -127,28 +126,28 @@ public class CrossfilterDemo implements EntryPoint {
             }
         });
 
-        Dimension<Data, Integer> d2 = crossfilter.dimension(new IntDimensionType<CrossfilterDemo.Data>() {
+        Dimension<Data, Integer> d2 = crossfilter.dimension(new IntReducer<CrossfilterDemo.Data>() {
 
             @Override
             public int getValue(Data object) {
                 return object.getValue2();
             }
         });
-        Dimension<Data, Double> d3 = crossfilter.dimension(new DoubleDimensionType<CrossfilterDemo.Data>() {
+        Dimension<Data, Double> d3 = crossfilter.dimension(new DoubleReducer<CrossfilterDemo.Data>() {
 
             @Override
             public double getValue(Data object) {
                 return object.getValue3();
             }
         });
-        Dimension<Data, String> d4 = crossfilter.dimension(new StringDimensionType<CrossfilterDemo.Data>() {
+        Dimension<Data, String> d4 = crossfilter.dimension(new StringReducer<CrossfilterDemo.Data>() {
 
             @Override
             public String getValue(Data object) {
                 return object.getValue4();
             }
         });
-        final Dimension<Data, Date> d5 = crossfilter.dimension(new DateDimensionType<CrossfilterDemo.Data>() {
+        final Dimension<Data, Date> d5 = crossfilter.dimension(new DateReducer<CrossfilterDemo.Data>() {
 
             @Override
             public Date getValue(Data object) {
@@ -186,7 +185,7 @@ public class CrossfilterDemo implements EntryPoint {
         }
 
         Group<Data, Date> g6 = d5.group(Util.createGroupingDays()).reduceSum(
-            new IntDimensionType<CrossfilterDemo.Data>() {
+            new IntReducer<CrossfilterDemo.Data>() {
 
                 @Override
                 public int getValue(Data object) {

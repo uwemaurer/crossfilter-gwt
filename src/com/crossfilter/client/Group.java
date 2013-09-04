@@ -1,6 +1,7 @@
 package com.crossfilter.client;
 
-import com.crossfilter.client.Dimension.DimensionType;
+import com.crossfilter.client.Dimension.ObjectReducer;
+import com.crossfilter.client.Dimension.Reducer;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
@@ -27,10 +28,19 @@ public class Group<T, K> extends JavaScriptObject {
 		return this.reduceCount();
     }-*/;
 
-     public final native <V> Group<T, K> reduceSum(final DimensionType<T, V> type) /*-{
-         return this.reduceSum(type.@com.crossfilter.client.Dimension.DimensionType::getFunction()());
+     public final native <V> Group<T, K> reduceSum(final Reducer<T, V> type) /*-{
+         return this.reduceSum(type.@com.crossfilter.client.Dimension.Reducer::getFunction()());
      }-*/;
-
+     
+     
+    public final native <V> Group<T, K> reduce(ObjectReducer<T, V> reducer) /*-{
+		return this
+				.reduce(
+						reducer.@com.crossfilter.client.Dimension.ObjectReducer::reduceAdd()(),
+						reducer.@com.crossfilter.client.Dimension.ObjectReducer::reduceRemove()(),
+						reducer.@com.crossfilter.client.Dimension.ObjectReducer::reduceInitialJs()());
+    }-*/;
+     
     // public final native Group<T, K> order() /*-{
     // return this.order();
     // }-*/;
@@ -56,8 +66,16 @@ public class Group<T, K> extends JavaScriptObject {
             return this.key;
         }-*/;
 
-        public final native double getValue() /*-{
+        public final native double getValueAsDouble() /*-{
 			return this.value;
+        }-*/;
+        
+        /**
+         * cast to own type
+         * @return
+         */
+        public final native <T> T getValue() /*-{
+            return this.value;
         }-*/;
 
     }
