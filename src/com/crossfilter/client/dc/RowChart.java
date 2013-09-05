@@ -5,17 +5,15 @@ public class RowChart<T, K> extends BaseChart<T, K> {
 
     protected RowChart() {
     }
-
+    
+    public static final <T, K> RowChart<T, K> create() {
+        return create(getNextId());
+    }
+    
     public static native <T, K> RowChart<T, K> create(String cssSelector) /*-{
 		return $wnd.dc.rowChart(cssSelector);
     }-*/;
     
-    public static <T, K> RowChart<T, K> create(ChartContainer w) {
-        RowChart<T, K> chart = create(w.getSelector());
-        w.setChart(chart);
-        return chart;
-    }
-
     // .colors(['#3182bd', '#6baed6', '#9ecae1', '#c6dbef', '#dadaeb'])
     // // (optional) set gap between rows, default is 5
     // gap(7)

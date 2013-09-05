@@ -15,8 +15,11 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ChartContainer extends Composite {
 
-    private static int next = 1;
+  
     private BaseChart<?, ?> chart;
+    private InlineLabel titleWidget;
+    private InlineLabel filter;
+    private InlineLabel filter2;
 
     public ChartContainer(String title) {
         this(title, true);
@@ -25,23 +28,54 @@ public class ChartContainer extends Composite {
     public ChartContainer(String title, boolean withFilter) {
         initWidget(createContainer(title, withFilter));
     }
+    
+    public ChartContainer(BaseChart<?, ?> chart, String title, boolean withFilter) {
+        initWidget(createContainer(title, withFilter));
+        setChart(chart);
+    }
+    
+    public static ChartContainer create(BaseChart<?, ?> chart, String title) {
+            return new ChartContainer(chart, title , true);
+    }
+    
+    public ChartContainer title(String title) {
+        titleWidget.setText(title);
+        return this;
+    }
+    
+    public ChartContainer showFilter(boolean show) {
+        filter2.setVisible(show);
+        filter2.setStyleName("filter", show);
+        filter.setStyleName("reset", show);
+        filter.setVisible(show);
+        return this;
+    }
+    
+    @Override
+    protected void onAttach() {
+        super.onAttach();
+        if (chart != null) {
+            chart.root(getElement());
+            getElement().setClassName("dc-chart");
+            getElement().setId(chart.anchorName());
+        }
+    }
 
     private Widget createContainer(String title, boolean withFilter) {
         HTMLPanel p = new HTMLPanel("");
-        p.add(new InlineLabel(title));
+        titleWidget = new InlineLabel(title);
+        p.add(titleWidget);
 
-        if (withFilter) {
-            InlineLabel filter = new InlineLabel("Filter: ");
-            filter.setStyleName("reset");
-            filter.setVisible(false);
-            p.add(filter);
-    
-            InlineLabel filter2 = new InlineLabel("");
-            filter2.setStyleName("filter");
-            p.add(filter2);
-        }
         
-        Anchor anchor = new Anchor("reset");
+        filter = new InlineLabel(" Filter: ");
+        p.add(filter);
+
+        filter2 = new InlineLabel("");
+        p.add(filter2);
+    
+        showFilter(withFilter);
+        
+        Anchor anchor = new Anchor(" Reset");
         anchor.setStyleName("reset");
         anchor.setVisible(false);
         anchor.addClickHandler(new ClickHandler() {
@@ -57,7 +91,6 @@ public class ChartContainer extends Composite {
         p.add(anchor);
     
         p.add(new SimplePanel());
-        p.getElement().setId("_dc_chart_" + next++);
         return p;
     }
 

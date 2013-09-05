@@ -4,6 +4,7 @@ import com.crossfilter.client.Dimension;
 import com.crossfilter.client.Group;
 import com.crossfilter.client.Group.KeyValue;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Element;
 
 /**
  * 
@@ -11,7 +12,12 @@ import com.google.gwt.core.client.JavaScriptObject;
  * 
  */
 public abstract class BaseChart<T, K> extends JavaScriptObject {
-
+    private static int next = 1;
+    
+    public static String getNextId() {
+        return "_dc_chart_" + next++;
+    }
+    
     protected BaseChart() {
     }
 
@@ -56,6 +62,16 @@ public abstract class BaseChart<T, K> extends JavaScriptObject {
 		this.redraw();
     }-*/;
 
+    
+    public final native void root(Element root) /*-{
+        this.root($wnd.d3.select(root));
+        this._anchor = root.id;
+    }-*/;
+    
+    public final native String anchorName() /*-{
+        return this.anchorName();
+    }-*/;
+    
     public static abstract class Accessor {
         protected abstract JavaScriptObject getFunction();
     }
@@ -147,4 +163,5 @@ public abstract class BaseChart<T, K> extends JavaScriptObject {
     public final native BaseChart<T, K> renderTitle(boolean render) /*-{
 		return this.renderTitle(render);
     }-*/;
+
 }

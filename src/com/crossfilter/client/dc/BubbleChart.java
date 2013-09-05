@@ -7,16 +7,14 @@ public class BubbleChart<T, K> extends CoordinateGridChart<T, K> {
     protected BubbleChart() {
     }
 
+    public static final <T, K> BubbleChart<T, K> create() {
+        return create(getNextId());
+    }
+    
     public static native <T, K> BubbleChart<T, K> create(String cssSelector) /*-{
 		return $wnd.dc.bubbleChart(cssSelector);
     }-*/;
-
-    public static <T, K> BubbleChart<T, K> create(ChartContainer w) {
-        BubbleChart<T, K> chart = create(w.getSelector());
-        w.setChart(chart);
-        return chart;
-    }
-
+  
     public final native BubbleChart<T, K> r(JavaScriptObject scale) /*-{
 		return this.r(scale);
     }-*/;
