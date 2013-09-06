@@ -12,12 +12,17 @@ import com.google.gwt.dom.client.Element;
  * 
  */
 public abstract class BaseChart<T, K> extends JavaScriptObject {
+
+    public interface ChartEventCallback<T, K> {
+        void onEvent(BaseChart<T, K> chart);
+    }
+
     private static int next = 1;
-    
+
     public static String getNextId() {
         return "_dc_chart_" + next++;
     }
-    
+
     protected BaseChart() {
     }
 
@@ -45,9 +50,17 @@ public abstract class BaseChart<T, K> extends JavaScriptObject {
     public final native BaseChart<T, K> dimension(Dimension<T, K> dimension) /*-{
 		return this.dimension(dimension);
     }-*/;
+    
+    public final native Dimension<T, K>  dimension() /*-{
+        return this.dimension();
+    }-*/;
 
     public final native BaseChart<T, K> group(Group<T, K> group) /*-{
 		return this.group(group);
+    }-*/;
+    
+    public final native Group<T, K> group() /*-{
+        return this.group();
     }-*/;
 
     public final native void filterAll() /*-{
@@ -62,16 +75,15 @@ public abstract class BaseChart<T, K> extends JavaScriptObject {
 		this.redraw();
     }-*/;
 
-    
     public final native void root(Element root) /*-{
-        this.root($wnd.d3.select(root));
-        this._anchor = root.id;
+		this.root($wnd.d3.select(root));
+		this._anchor = root.id;
     }-*/;
-    
+
     public final native String anchorName() /*-{
-        return this.anchorName();
+		return this.anchorName();
     }-*/;
-    
+
     public static abstract class Accessor {
         protected abstract JavaScriptObject getFunction();
     }
@@ -123,7 +135,7 @@ public abstract class BaseChart<T, K> extends JavaScriptObject {
 			};
         }-*/;
     }
-    
+
     public final void keyAccessor(Accessor accessor) {
         keyAccessor(accessor.getFunction());
     }
@@ -162,6 +174,39 @@ public abstract class BaseChart<T, K> extends JavaScriptObject {
 
     public final native BaseChart<T, K> renderTitle(boolean render) /*-{
 		return this.renderTitle(render);
+    }-*/;
+
+    public final BaseChart<T, K> setOnFilter(final ChartEventCallback<T, K> callback) {
+        return setOn("filtered", callback);
+    }
+
+    public final BaseChart<T, K> setOnPreRender(final ChartEventCallback<T, K> callback) {
+        return setOn("preRender", callback);
+    }
+
+    public final BaseChart<T, K> setOnPostRender(final ChartEventCallback<T, K> callback) {
+        return setOn("postRender", callback);
+    }
+
+    public final BaseChart<T, K> setOnPreRedraw(final ChartEventCallback<T, K> callback) {
+        return setOn("preRedraw", callback);
+    }
+
+    public final BaseChart<T, K> setOnPostRedraw(final ChartEventCallback<T, K> callback) {
+        return setOn("postRedraw", callback);
+    }
+
+    public final BaseChart<T, K> setOnZoomed(final ChartEventCallback<T, K> callback) {
+        return setOn("zoomed", callback);
+    }
+    
+    private final native BaseChart<T, K> setOn(final String event, final ChartEventCallback<T, K> callback) /*-{
+		return this
+				.on(
+						event,
+						function(chart) {
+							return callback.@com.crossfilter.client.dc.BaseChart.ChartEventCallback::onEvent(Lcom/crossfilter/client/dc/BaseChart;)(chart);
+						});
     }-*/;
 
 }

@@ -12,11 +12,52 @@ public class Dimension<T, K> extends JavaScriptObject {
 
     protected Dimension() {
     }
-
-    public static abstract class Reducer<T, K> {
+    
+    public static abstract class JavaScriptFunctionFactory {
         protected abstract JavaScriptObject getFunction();
     }
+    
+    public static abstract class Reducer<T, K> extends JavaScriptFunctionFactory {
+        
+    }
+    
+    public static abstract class Filter<K> extends JavaScriptFunctionFactory {
+        
+    }
 
+    public static abstract class IntFilter extends Filter<Integer> {
+        public abstract boolean filter(int object);
+
+        @Override
+        protected JavaScriptObject getFunction() {
+            return f();
+        }
+
+        private final native JavaScriptObject f() /*-{
+            var self = this;
+            return function(v) {
+                return self.@com.crossfilter.client.Dimension.IntFilter::filter(I)(v);
+            };
+        }-*/;
+    }
+    
+
+    public static abstract class StringFilter extends Filter<String> {
+        public abstract boolean filter(String object);
+
+        @Override
+        protected JavaScriptObject getFunction() {
+            return f();
+        }
+
+        private final native JavaScriptObject f() /*-{
+            var self = this;
+            return function(v) {
+                return self.@com.crossfilter.client.Dimension.StringFilter::filter(Ljava/lang/String;)(v);
+            };
+        }-*/;
+    }
+    
     public static abstract class IntReducer<T> extends Reducer<T, Integer> {
         public abstract int getValue(T object);
 
@@ -198,7 +239,7 @@ public class Dimension<T, K> extends JavaScriptObject {
 		return this.group(func);
     }-*/;
 
-    public final native Group<T, K> filterAll() /*-{
+    public final native Dimension<T, K> filterAll() /*-{
 		return this.filterAll();
     }-*/;
 
@@ -209,7 +250,7 @@ public class Dimension<T, K> extends JavaScriptObject {
      * @param value
      * @return
      */
-    private final Group<T, K> filterExact(K value) {
+    private final Dimension<T, K> filterExact(K value) {
         if (value.getClass() == Integer.class) {
             return filterExact((Integer) value);
         } else if (value.getClass() == Double.class) {
@@ -220,16 +261,21 @@ public class Dimension<T, K> extends JavaScriptObject {
         return null;
     }
 
-    private final native Group<T, K> filterExact(int value) /*-{
+    private final native Dimension<T, K> filterExact(int value) /*-{
 		return this.filterExact(value);
     }-*/;
 
-    private final native Group<T, K> filterExact(double value) /*-{
+    private final native Dimension<T, K> filterExact(double value) /*-{
 		return this.filterExact(value);
     }-*/;
 
-    private final native Group<T, K> filterExact(String value) /*-{
+    private final native Dimension<T, K> filterExact(String value) /*-{
 		return this.filterExact(value);
+    }-*/;
+    
+    public final native Dimension<T, K> filterFunction(final Filter<K> filter) /*-{
+		return this
+				.filterFunction(filter.@com.crossfilter.client.Dimension.Filter::getFunction()());
     }-*/;
 
     /**
@@ -240,7 +286,7 @@ public class Dimension<T, K> extends JavaScriptObject {
      * @param to
      * @return
      */
-    public final Group<T, K> filterRange(K from, K to) {
+    public final Dimension<T, K> filterRange(K from, K to) {
         if (from.getClass() == Integer.class) {
             return filterRange((Integer) from, (Integer) to);
         } else if (from.getClass() == Double.class) {
@@ -251,20 +297,24 @@ public class Dimension<T, K> extends JavaScriptObject {
         return null;
     }
 
-    private final native Group<T, K> filterRange(int from, int to) /*-{
+    private final native Dimension<T, K> filterRange(int from, int to) /*-{
 		return this.filterRange([ from, to ]);
     }-*/;
 
-    private final native Group<T, K> filterRange(double from, double to) /*-{
+    private final native Dimension<T, K> filterRange(double from, double to) /*-{
 		return this.filterRange([ from, to ]);
     }-*/;
 
-    private final native Group<T, K> filterRange(String from, String to) /*-{
+    private final native Dimension<T, K> filterRange(String from, String to) /*-{
 		return this.filterRange([ from, to ]);
     }-*/;
 
     private final native JsArray<JavaScriptObject> topJs(int n) /*-{
 		return this.top(n);
+    }-*/;
+    
+    private final native JsArray<JavaScriptObject> topAllJs() /*-{
+        return this.top(Infinity);
     }-*/;
 
     private final native JsArray<JavaScriptObject> bottomJs(int n) /*-{
@@ -299,5 +349,10 @@ public class Dimension<T, K> extends JavaScriptObject {
 
     public static JavaScriptObject _getFunction(Reducer<?, ?> func) {
         return func.getFunction();
+    }
+
+    public final List<T> top() {
+        JsArray<JavaScriptObject> topList = topAllJs();
+        return toList(topList);
     }
 }

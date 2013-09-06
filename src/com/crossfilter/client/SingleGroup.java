@@ -19,7 +19,7 @@ public class SingleGroup<T, K> extends JavaScriptObject {
 		return this.value();
     }-*/;
 
-    public final native double getValueInt() /*-{
+    public final native int getValueInt() /*-{
 		return this.value();
     }-*/;
 }

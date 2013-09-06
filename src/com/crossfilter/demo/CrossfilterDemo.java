@@ -1,29 +1,35 @@
 package com.crossfilter.demo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import com.crossfilter.client.BarChart;
-import com.crossfilter.client.BarChart.RenderCallback;
 import com.crossfilter.client.Crossfilter;
 import com.crossfilter.client.Dimension;
 import com.crossfilter.client.Dimension.DateReducer;
 import com.crossfilter.client.Dimension.DoubleReducer;
-import com.crossfilter.client.Dimension.DoubleGrouping;
-import com.crossfilter.client.Dimension.IntReducer;
 import com.crossfilter.client.Dimension.IntGrouping;
+import com.crossfilter.client.Dimension.IntReducer;
+import com.crossfilter.client.Dimension.StringFilter;
 import com.crossfilter.client.Dimension.StringReducer;
 import com.crossfilter.client.Group;
 import com.crossfilter.client.Group.KeyValue;
 import com.crossfilter.client.SingleGroup;
 import com.crossfilter.client.Util;
+import com.crossfilter.client.dc.BarChart;
+import com.crossfilter.client.dc.BaseChart;
+import com.crossfilter.client.dc.BaseChart.ChartEventCallback;
+import com.crossfilter.client.dc.ChartContainer;
+import com.crossfilter.client.dc.Dc;
+import com.crossfilter.client.dc.RowChart;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.view.client.ListDataProvider;
@@ -109,16 +115,17 @@ public class CrossfilterDemo implements EntryPoint {
 
     private void demo() {
         final List<Data> data = new ArrayList<Data>();
-        for (int i = 0; i < 2000; i++) {
-            data.add(new Data(i, (int) (Math.random() * Math.random() * i), Math.random(), "abc"
-                + (int) (Math.random() * 6), new Date(System.currentTimeMillis() + i * 1000000)));
+        for (int i = 0; i < 200; i++) {
+            data.add(new Data(i, (int) (Math.random() * Math.random() * i), Math.random() * 10.0,
+                "abc" + (int) (Math.random() * 6), new Date(System.currentTimeMillis() + i * 1000
+                    * 86400)));
         }
 
         final Crossfilter<Data> crossfilter = Crossfilter.create(data);
 
         GWT.log("" + crossfilter.size());
 
-        Dimension<Data, Integer> d1 = crossfilter.dimension(new IntReducer<CrossfilterDemo.Data>() {
+        final Dimension<Data, Integer> d1 = crossfilter.dimension(new IntReducer<CrossfilterDemo.Data>() {
 
             @Override
             public int getValue(Data object) {
@@ -140,7 +147,7 @@ public class CrossfilterDemo implements EntryPoint {
                 return object.getValue3();
             }
         });
-        Dimension<Data, String> d4 = crossfilter.dimension(new StringReducer<CrossfilterDemo.Data>() {
+        final Dimension<Data, String> d4 = crossfilter.dimension(new StringReducer<CrossfilterDemo.Data>() {
 
             @Override
             public String getValue(Data object) {
@@ -170,18 +177,13 @@ public class CrossfilterDemo implements EntryPoint {
 
         final SingleGroup<Data, Integer> all = crossfilter.groupAll();
         Group<Data, Integer> g2 = d2.group();
-        Group<Data, Double> g3 = d3.group(new DoubleGrouping() {
-            @Override
-            public double getGroup(double object) {
-                return Math.floor(object * 10) / 10;
-            }
-        });
+        Group<Data, Double> g3 = d3.group(Util.createGroupingMultipleOf(0.4));
         Group<Data, String> g4 = d4.group();
-        Group<Data, Date> g5 = d5.group(Util.createGroupingDays());
+        Group<Data, Date> g5 = d5.group(Util.createGroupingWeeks());
 
         JsArray<KeyValue> top2 = g3.top(5);
         for (int i = 0; i < top2.length(); i++) {
-            GWT.log("" + top2.get(i).getValue());
+            // GWT.log("" + top2.get(i).getValue());
         }
 
         Group<Data, Date> g6 = d5.group(Util.createGroupingDays()).reduceSum(
@@ -193,11 +195,44 @@ public class CrossfilterDemo implements EntryPoint {
                 }
             });
 
-        BarChart chart = BarChart.create(d1, g, 1000).title("value1");
-        BarChart chart2 = BarChart.create(d2, g2, 1000).title("value2");
-        BarChart chart3 = BarChart.create(d3, g3, 1000).title("value3");
-        BarChart chart5 = BarChart.createDate(d5, g5, 1000).title("value5");
-        BarChart chart6 = BarChart.createDate(d5, g6, 1000).title("value5");
+        {
+            BarChart<Data, Integer> chart = BarChart.create();
+            chart.dimension(d1).group(g);
+            chart.x(Util.linearDomain(0, 1)).elasticX(true).elasticY(true);
+            chart.width(600);
+            RootPanel.get().add(ChartContainer.create(chart, "value1"));
+        }
+
+        {
+            BarChart<Data, Integer> chart = BarChart.create();
+            chart.dimension(d2).group(g2);
+            chart.x(Util.linearDomain(0, 1)).elasticX(true).elasticY(true);
+            chart.width(600);
+            RootPanel.get().add(ChartContainer.create(chart, "value2"));
+        }
+        {
+            BarChart<Data, Double> chart = BarChart.create();
+            chart.dimension(d3).group(g3);
+            chart.x(Util.linearDomain(0.0, 10.0)).elasticY(true);
+            chart.width(600);
+            RootPanel.get().add(ChartContainer.create(chart, "value3"));
+        }
+        {
+            RowChart<Data, String> chart = RowChart.create();
+            chart.dimension(d4).group(g4);
+            chart.width(600);
+            RootPanel.get().add(ChartContainer.create(chart, "value4"));
+        }
+        {
+            BarChart<Data, Date> chart = BarChart.create();
+            chart.dimension(d5).group(g5);
+            chart.x(Util.timeDomain(0, 1)).elasticX(true).elasticY(true);
+            chart.width(600);
+            RootPanel.get().add(ChartContainer.create(chart, "value3"));
+        }
+      
+      
+
 
         CellTable<Data> table = new CellTable<Data>();
         TextColumn<Data> nameColumn = new TextColumn<Data>() {
@@ -217,22 +252,47 @@ public class CrossfilterDemo implements EntryPoint {
 
         final ListDataProvider<Data> dataProvider = new ListDataProvider<Data>();
         dataProvider.addDataDisplay(table);
-
         final Label allLabel = new Label();
-
-        BarChart.render(RootPanel.getBodyElement(),
-            Arrays.asList(chart, chart2, chart3, chart5, chart6), new RenderCallback() {
+       
+        
+        {
+            BarChart<Data, Date> chart = BarChart.create();
+            chart.dimension(d5).group(g6);
+            chart.x(Util.timeDomain(0, 1)).elasticX(true).elasticY(true);
+            chart.width(600);
+            chart.setOnPreRedraw(new ChartEventCallback<CrossfilterDemo.Data, Date>() {
 
                 @Override
-                public void renderAll() {
-                    dataProvider.getList().clear();
-                    dataProvider.getList().addAll(d5.top(10));
-                    dataProvider.refresh();
-                    allLabel.setText("" + all.getValue() + " of " + crossfilter.size());
+                public void onEvent(BaseChart<Data, Date> chart) {
+                     allLabel.setText("" + all.getValueInt() + " of " + crossfilter.size());
+                     dataProvider.getList().clear();
+                     dataProvider.getList().addAll(d5.top(10));
+                     dataProvider.refresh();
+                   
                 }
             });
+            RootPanel.get().add(ChartContainer.create(chart, "value3"));
+        }
+        Button filter = new Button("filter");
+        filter.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+               
+                d4.filterFunction(new StringFilter() {
+
+                    @Override
+                    public boolean filter(String value) {
+                        return value.equals("abc3");
+                    }
+                });
+               
+                Dc.redrawAll();
+            }
+        });
+        RootPanel.get().add(filter);
         RootPanel.get().add(allLabel);
         RootPanel.get().add(table);
+        Dc.renderAll();
     }
 
 }
