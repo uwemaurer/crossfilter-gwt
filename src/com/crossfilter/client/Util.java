@@ -28,7 +28,7 @@ public class Util {
         return new GroupingFunction<Date>(roundToWeeks());
     }
 
-    private static final native JavaScriptObject roundToMultiple(double m) /*-{
+    public static final native JavaScriptObject roundToMultiple(double m) /*-{
 		return function(v) {
 			return Math.round(v / m) * m;
 		};
@@ -76,8 +76,17 @@ public class Util {
         return $wnd.dc.round.floor;
     }-*/;
     
+    public static final native JavaScriptObject round() /*-{
+        return $wnd.dc.round.round;
+    }-*/;
+
+    
     public static final native JavaScriptObject unitIntegers() /*-{
         return $wnd.dc.units.integers;
+    }-*/;
+    
+    public static final native JavaScriptObject unitPrecision(double precision) /*-{
+        return $wnd.dc.units.fp.precision(precision);
     }-*/;
 
     public static final JavaScriptObject timeDomain(long start, long end) {

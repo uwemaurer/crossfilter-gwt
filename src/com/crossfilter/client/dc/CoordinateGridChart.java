@@ -47,7 +47,7 @@ public abstract class CoordinateGridChart<T, K> extends ColorChart<T, K> {
 		return this.elasticY(elastic);
     }-*/;
 
-    public final native CoordinateGridChart<T, K> xAxisPadding(int padding) /*-{
+    public final native CoordinateGridChart<T, K> xAxisPadding(double padding) /*-{
 		return this.xAxisPadding(padding);
     }-*/;
 
