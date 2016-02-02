@@ -1,0 +1,23 @@
+apply from: '../deps.gradle'
+eclipse {
+	classpath {
+		defaultOutputDir = file('war/WEB-INF/classes')
+		file {
+			withXml {
+				def node = it.asNode()
+				node.appendNode('classpathentry', [kind: 'con', path: 'com.google.gwt.eclipse.core.GWT_CONTAINER'])
+			}
+		}
+	}
+}
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src']
+		}
+	}
+}
+dependencies {
+
+}
+
