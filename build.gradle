@@ -55,3 +55,7 @@ assemble.dependsOn(sourcesJar)
 artifacts {
     gwtJar sourcesJar
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.11'
+}
