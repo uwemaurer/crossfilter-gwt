@@ -1,23 +1,57 @@
-apply from: '../deps.gradle'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
+    }
+}
+
+repositories {
+        jcenter()
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'distribution'
+apply plugin: 'gwt-base'
+
+gwt {
+    gwtVersion='2.6.0'
+}
+
+
+sourceCompatibility = 1.7
+version = '1.1'
+
 eclipse {
 	classpath {
 		defaultOutputDir = file('war/WEB-INF/classes')
-		file {
-			withXml {
-				def node = it.asNode()
-				node.appendNode('classpathentry', [kind: 'con', path: 'com.google.gwt.eclipse.core.GWT_CONTAINER'])
-			}
-		}
 	}
 }
+
 sourceSets {
 	main {
-		java {
-			srcDirs = ['src']
-		}
+		java.srcDirs = ['src']
+	}
+	test {
+		java.srcDirs = ['srctest']
 	}
 }
-dependencies {
 
+
+configurations {
+	gwtJar
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+}
+
+assemble.dependsOn(sourcesJar)
+
+artifacts {
+    gwtJar sourcesJar
+}
