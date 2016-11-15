@@ -7,3 +7,7 @@ To build this library do
     
 It generates a jar file `crossfilter-gwt-1.1-sources.jar` in `build/libs/` which you can use in your GWT project.
 
+
+To compile the demo app:
+
+    ./gradlew compileGwt
