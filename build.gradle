@@ -14,15 +14,12 @@ repositories {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'distribution'
-apply plugin: 'gwt-base'
-
-gwt {
-    gwtVersion='2.6.0'
-}
+apply plugin: 'gwt'
 
 
-sourceCompatibility = 1.7
-version = '1.1'
+
+sourceCompatibility = 1.8
+version = '1.1.1'
 
 eclipse {
 	classpath {
@@ -34,11 +31,10 @@ sourceSets {
 	main {
 		java.srcDirs = ['src']
 	}
-	test {
+	demo {
 		java.srcDirs = ['srctest']
 	}
-}
-
+} 
 
 configurations {
 	gwtJar
@@ -57,5 +53,31 @@ artifacts {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
+    gradleVersion = '3.2'
 }
+
+gwt {
+    gwtVersion='2.8.0'
+
+    src = files(sourceSets.demo.java.srcDirs) + files(sourceSets.main.java.srcDirs)
+    	 
+    modules 'com.crossfilter.demo.CrossfilterDemo'
+    minHeapSize = "512M"
+    maxHeapSize = "1024M"
+    eclipse {
+    	addGwtContainer = false
+    }
+}
+
+task copyGwtToWar(dependsOn: compileGwt) {
+  doLast {
+		def dir = "war"
+		delete files("$dir/crossfilter-demo")
+		copy {
+			from tasks.compileGwt.war
+			into dir
+		}
+	}
+}
+
+compileGwt.finalizedBy copyGwtToWar

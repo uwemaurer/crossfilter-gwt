@@ -1,4 +1,4 @@
-package com.crossfilter.demo;
+package com.crossfilter.demo.client;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,15 +36,16 @@ import com.google.gwt.view.client.ListDataProvider;
 
 /**
  * demo / test application
- * 
+ *
  * @author uwe
- * 
+ *
  */
 public class CrossfilterDemo implements EntryPoint {
 
     /**
      * This is the entry point method.
      */
+    @Override
     public void onModuleLoad() {
 
         demo();
@@ -125,13 +126,14 @@ public class CrossfilterDemo implements EntryPoint {
 
         GWT.log("" + crossfilter.size());
 
-        final Dimension<Data, Integer> d1 = crossfilter.dimension(new IntReducer<CrossfilterDemo.Data>() {
+        final Dimension<Data, Integer> d1 = crossfilter
+            .dimension(new IntReducer<CrossfilterDemo.Data>() {
 
-            @Override
-            public int getValue(Data object) {
-                return object.getValue1();
-            }
-        });
+                @Override
+                public int getValue(Data object) {
+                    return object.getValue1();
+                }
+            });
 
         Dimension<Data, Integer> d2 = crossfilter.dimension(new IntReducer<CrossfilterDemo.Data>() {
 
@@ -140,27 +142,30 @@ public class CrossfilterDemo implements EntryPoint {
                 return object.getValue2();
             }
         });
-        Dimension<Data, Double> d3 = crossfilter.dimension(new DoubleReducer<CrossfilterDemo.Data>() {
+        Dimension<Data, Double> d3 = crossfilter
+            .dimension(new DoubleReducer<CrossfilterDemo.Data>() {
 
-            @Override
-            public double getValue(Data object) {
-                return object.getValue3();
-            }
-        });
-        final Dimension<Data, String> d4 = crossfilter.dimension(new StringReducer<CrossfilterDemo.Data>() {
+                @Override
+                public double getValue(Data object) {
+                    return object.getValue3();
+                }
+            });
+        final Dimension<Data, String> d4 = crossfilter
+            .dimension(new StringReducer<CrossfilterDemo.Data>() {
 
-            @Override
-            public String getValue(Data object) {
-                return object.getValue4();
-            }
-        });
-        final Dimension<Data, Date> d5 = crossfilter.dimension(new DateReducer<CrossfilterDemo.Data>() {
+                @Override
+                public String getValue(Data object) {
+                    return object.getValue4();
+                }
+            });
+        final Dimension<Data, Date> d5 = crossfilter
+            .dimension(new DateReducer<CrossfilterDemo.Data>() {
 
-            @Override
-            public Date getValue(Data object) {
-                return object.getValue5();
-            }
-        });
+                @Override
+                public Date getValue(Data object) {
+                    return object.getValue5();
+                }
+            });
 
         List<Data> top = d2.top(5);
         for (Data da : top) {
@@ -230,9 +235,6 @@ public class CrossfilterDemo implements EntryPoint {
             chart.width(600);
             RootPanel.get().add(ChartContainer.create(chart, "value3"));
         }
-      
-      
-
 
         CellTable<Data> table = new CellTable<Data>();
         TextColumn<Data> nameColumn = new TextColumn<Data>() {
@@ -253,8 +255,7 @@ public class CrossfilterDemo implements EntryPoint {
         final ListDataProvider<Data> dataProvider = new ListDataProvider<Data>();
         dataProvider.addDataDisplay(table);
         final Label allLabel = new Label();
-       
-        
+
         {
             BarChart<Data, Date> chart = BarChart.create();
             chart.dimension(d5).group(g6);
@@ -264,11 +265,11 @@ public class CrossfilterDemo implements EntryPoint {
 
                 @Override
                 public void onEvent(BaseChart<Data, Date> chart) {
-                     allLabel.setText("" + all.getValueInt() + " of " + crossfilter.size());
-                     dataProvider.getList().clear();
-                     dataProvider.getList().addAll(d5.top(10));
-                     dataProvider.refresh();
-                   
+                    allLabel.setText("" + all.getValueInt() + " of " + crossfilter.size());
+                    dataProvider.getList().clear();
+                    dataProvider.getList().addAll(d5.top(10));
+                    dataProvider.refresh();
+
                 }
             });
             RootPanel.get().add(ChartContainer.create(chart, "value3"));
@@ -277,7 +278,7 @@ public class CrossfilterDemo implements EntryPoint {
         filter.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-               
+
                 d4.filterFunction(new StringFilter() {
 
                     @Override
@@ -285,7 +286,7 @@ public class CrossfilterDemo implements EntryPoint {
                         return value.equals("abc3");
                     }
                 });
-               
+
                 Dc.redrawAll();
             }
         });
